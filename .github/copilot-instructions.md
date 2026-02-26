@@ -12,19 +12,19 @@ You are the **DAS Village Orchestrator** for this repo.
 
 ## This Repo's Role
 - **Layer:** Platform / Infra — Production Builder & Cache
-- **Purpose:** nixify.cloud is the village's production Nix binary cache, remote builder network, and builder-as-a-service platform. Hosts Harmonia/Attic cache server, SeaweedFS object storage, manages substituter configs, and provides the production HTTPS deployment surface for all DASxGNDO services. All village machines use this as their primary binary cache.
-- **Stack:** NixOS, Harmonia (binary cache), Attic, SeaweedFS, Tailscale (private admin access), Nginx reverse proxy, `nix-cfg` modules
-- **Domain:** nixify.cloud (public cache + services)
+- **Purpose:** nixify.cloud is the village's production Nix binary cache, remote builder network, and builder-as-a-service platform. Hosts Harmonia/Attic cache server, manages substituter configs, and provides the production deployment surface for all DASxGNDO services. The build and cache layer for the entire village.
+- **Stack:** NixOS, Harmonia (binary cache) or Attic, Tailscale mesh, Nginx reverse proxy, `nix-cfg` modules, SeaweedFS (object storage)
+- **Domain:** nixify.cloud (production)
 - **Canonical flake input:** `github:RyzeNGrind/nixify.cloud`
-- **Depends on:** `nix-cfg` (system config), `core`, `nixos-anywhere` (first-time provisioning)
-- **Provides to village:** Binary cache substituter (`https://cache.nixify.cloud`), remote build capacity, production HTTPS endpoints for all village web services (`aifluence`, `DASxGNDO` dashboard)
-- **Cache signing key:** Managed via `sops-nix` in `nix-cfg` — never committed plaintext
+- **Depends on:** `nix-cfg` (system config), `core`, `nixos-anywhere` (provisioning)
+- **Provides to village:** Binary cache substituter (https://cache.nixify.cloud), remote build capacity (ssh://build@nixify.cloud), production HTTPS endpoints for all village services
+- **Security:** Cache signing key managed via `sops-nix` — never committed plaintext. All admin services behind Tailscale + Nginx — no direct internet exposure.
 
 ## Non-Negotiables
 - `nix-fast-build` MANDATORY: `nix run github:Mic92/nix-fast-build -- --flake .#checks`
 - Cache signing key managed via `sops-nix` — never committed plaintext
-- All admin services behind Tailscale (`tailce65.ts.net`) + Nginx — no direct public internet exposure
-- `impermanence` — ephemeral root, explicit opt-in state for cache data
+- All admin services behind Tailscale + Nginx — no direct internet exposure for admin interfaces
+- `flake-regressions` TDD — cache corruption = catastrophic
 - Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`)
 - SSH keys auto-fetched from https://github.com/ryzengrind.keys
 
